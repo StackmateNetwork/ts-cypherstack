@@ -42,3 +42,11 @@ cypherpost.spec.ts will therefore require a timeout with mocha.
 ```
 mocha -r ts-node/register cypherpost*.spec.ts --timeout 10000 --exit
 ```
+
+## wallet/bin
+
+Since this project has just started and is primarily being built on Linux, binaries only exist for Linux. 
+
+If testing on Mac or Windows, you will have to compile [stackmate-core](https://github.com/i5hi/stackmate-core) binaries for those targets.  
+
+This will be added later.

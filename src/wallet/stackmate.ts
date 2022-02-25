@@ -25,13 +25,13 @@ else {
 }
 
 export const stackmate = ffi.Library(libStackmateLocation, {
-  generate_master: [string, [string, string, string]]
+  generate_master: [string, [string, string, string]],
+  import_master: [string, [string, string, string]],
 });
 
-
-export function generateMaster(strength: MnemonicWords, network: BitcoinNetwork, passphrase: string): MasterKey | Error {
+export function generateMaster(network: BitcoinNetwork,strength: MnemonicWords, passphrase: string): MasterKey | Error {
   try {
-    const stringified = stackmate.generate_master(strength.toString(), network.toString(), passphrase);
+    const stringified = stackmate.generate_master(network.toString(),strength.toString(),passphrase);
     const json = JSON.parse(stringified);
 
     if (json.hasOwnProperty("kind")) {
@@ -48,5 +48,25 @@ export function generateMaster(strength: MnemonicWords, network: BitcoinNetwork,
   catch (e) {
     return handleError(e);
   }
+}
 
+export function importMaster(network: BitcoinNetwork,mnemonic: string, passphrase: string): MasterKey | Error {
+  try {
+    const stringified = stackmate.import_master(network.toString(), mnemonic, passphrase);
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        fingerprint: json.fingerprint,
+        mnemonic: json.mnemonic,
+        xprv: json.xprv
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
 }

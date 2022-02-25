@@ -5,7 +5,7 @@ Developed @ Stackmate India
 
 import { expect } from "chai";
 import "mocha";
-import { generateMaster } from './stackmate';
+import { generateMaster, importMaster } from './stackmate';
 import { BitcoinNetwork, MasterKey, MnemonicWords } from "./types/data";
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
@@ -13,11 +13,13 @@ import { BitcoinNetwork, MasterKey, MnemonicWords } from "./types/data";
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 describe("***stackmate-core::ffi*** ", function () {
-
-  it("GENERATES a 24 word mnemonic MASTER KEY", async function () {
-   const response = generateMaster(MnemonicWords.High,BitcoinNetwork.Test,"secretSauces") as MasterKey;
-   console.log(response)
-   expect(response.mnemonic.split(" ").length).to.equal(24);
+  const passphrase = "secretSauces";
+  it("GENERATES & IMPORTS a 24 word mnemonic MASTER KEY", async function () {
+   const generated = generateMaster(BitcoinNetwork.Test,MnemonicWords.High,passphrase) as MasterKey;
+   expect(generated.mnemonic.split(" ").length).to.equal(24);
+   const imported =  importMaster(BitcoinNetwork.Test,generated.mnemonic,passphrase) as MasterKey;
+   expect(generated.xprv).to.equal(imported.xprv);
+   
   });
 
 });
