@@ -1,0 +1,39 @@
+{
+  "name": "stackmatrix",
+  "version": "1.0.0",
+  "description": "basic matrix client for stackmate wallet",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dist/index.js"
+  },
+  "keywords": [
+    "stackmate",
+    "matrix",
+    "demo"
+  ],
+  "author": "i5hi",
+  "license": "MIT",
+  "dependencies": {
+    "@noble/secp256k1": "^1.5.3",
+    "@types/bip32": "^2.0.0",
+    "@types/chai": "^4.3.0",
+    "@types/crypto-js": "^4.1.1",
+    "@types/lodash": "^4.14.178",
+    "@types/lowdb": "^1.0.11",
+    "@types/mocha": "^9.1.0",
+    "axios": "^0.26.0",
+    "bip32": "^2.0.6",
+    "bip39": "^3.0.4",
+    "chai": "^4.3.6",
+    "ffi-cross": "^5.0.10",
+    "ffi-napi": "^4.0.3",
+    "hdkey": "^2.0.1",
+    "level": "^7.0.1",
+    "level-sublevel": "^6.6.5",
+    "lodash": "^4.17.21",
+    "lowdb": "github:dankreiger/lowdb#chore/esm-cjs-hybrid-WITH-LIB",
+    "mocha": "^9.2.0",
+    "ts-node": "^10.5.0"
+  }
+}
