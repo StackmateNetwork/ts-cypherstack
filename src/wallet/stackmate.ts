@@ -1,6 +1,6 @@
-const LINUX_PATH = "./stackmate-core/bin/libstackmate.so";
-const MAC_PATH = "./stackmate-core/bin/libstackmate.dylib";
-const WINDOWNS_PATH = "./stackmate-core/bin/libstackmate.dll";
+const LINUX_PATH = "./bin/linux/libstackmate.so";
+const MAC_PATH = "./bin/osx/libstackmate.dylib";
+const WINDOWNS_PATH = "./bin/win32/libstackmate.dll";
 
 import { handleError } from "../lib/error";
 import { BitcoinNetwork, MasterKey, MnemonicWords } from "./types/data";
