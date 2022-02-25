@@ -3,7 +3,7 @@ const MAC_PATH = "./bin/osx/libstackmate.dylib";
 const WINDOWNS_PATH = "./bin/win32/libstackmate.dll";
 
 import { handleError } from "../lib/error";
-import { BitcoinNetwork, ChildKey, MasterKey, MnemonicWords, PurposePath } from "./types/data";
+import { BitcoinNetwork, ChildKey, MasterKey, MnemonicWords, PurposePath, ScriptType, WalletPolicy } from "./types/data";
 
 const ffi = require("ffi-napi")
 const string = "string";
@@ -28,6 +28,7 @@ export const stackmate = ffi.Library(libStackmateLocation, {
   generate_master: [string, [string, string, string]],
   import_master: [string, [string, string, string]],
   derive_hardened: [string, [string, string, string]],
+  compile:[string, [string, string]]
 });
 
 export function generateMaster(network: BitcoinNetwork,strength: MnemonicWords, passphrase: string): MasterKey | Error {
@@ -91,4 +92,32 @@ export function deriveHardened(master_xprv: string,purpose: PurposePath, account
   catch (e) {
     return handleError(e);
   }
+}
+
+export function compilePolicy(policy_string: string, script_type: ScriptType): WalletPolicy | Error{
+  try {
+    const stringified = stackmate.compile(policy_string, script_type.toString());
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        policy: json.policy,
+        descriptor: json.descriptor
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
+}
+
+export function createExtendedKeyString(child_key: ChildKey): string{
+  return `[${child_key.fingerprint}/${child_key.hardened_path}]${child_key.xpub}/*`;
+}
+
+export function createMultiPolicyString(thresh: number, keys: string[]): string{
+  return `thresh(${thresh},${keys.map(key=>`pk(${key})`).join(",")})`;
 }

@@ -26,3 +26,15 @@ export enum PurposePath{
   SegwitP2SH = "49",
   Legacy = "44"
 }
+
+export type WalletPolicy = {
+  policy: string,
+  descriptor: string
+};
+
+export enum ScriptType {
+  SegwitSingle = "wpkh",
+  SegwitScript = "wsh",
+  SegwitP2SH = "sh-wsh",
+  LegacyScript = "sh"
+}
