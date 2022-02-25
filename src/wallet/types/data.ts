@@ -13,3 +13,16 @@ export type MasterKey = {
   mnemonic: string,
   xprv: string
 };
+
+export type ChildKey=  {
+  fingerprint: String,
+  hardened_path: String,
+  xprv: String,
+  xpub: String
+}
+
+export enum PurposePath{
+  SegwitNative  = "84",
+  SegwitP2SH = "49",
+  Legacy = "44"
+}

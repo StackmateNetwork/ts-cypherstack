@@ -3,7 +3,7 @@ const MAC_PATH = "./bin/osx/libstackmate.dylib";
 const WINDOWNS_PATH = "./bin/win32/libstackmate.dll";
 
 import { handleError } from "../lib/error";
-import { BitcoinNetwork, MasterKey, MnemonicWords } from "./types/data";
+import { BitcoinNetwork, ChildKey, MasterKey, MnemonicWords, PurposePath } from "./types/data";
 
 const ffi = require("ffi-napi")
 const string = "string";
@@ -27,6 +27,7 @@ else {
 export const stackmate = ffi.Library(libStackmateLocation, {
   generate_master: [string, [string, string, string]],
   import_master: [string, [string, string, string]],
+  derive_hardened: [string, [string, string, string]],
 });
 
 export function generateMaster(network: BitcoinNetwork,strength: MnemonicWords, passphrase: string): MasterKey | Error {
@@ -63,6 +64,27 @@ export function importMaster(network: BitcoinNetwork,mnemonic: string, passphras
         fingerprint: json.fingerprint,
         mnemonic: json.mnemonic,
         xprv: json.xprv
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
+}
+export function deriveHardened(master_xprv: string,purpose: PurposePath, account: number): ChildKey | Error {
+  try {
+    const stringified = stackmate.derive_hardened(master_xprv, purpose.toString(), account.toString());
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        fingerprint: json.fingerprint,
+        hardened_path: json.hardened_path,
+        xprv: json.xprv,
+        xpub: json.xpub
       }
     }
   }
