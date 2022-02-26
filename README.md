@@ -36,13 +36,17 @@ Navigate into folders with *.spec.ts files and run the following:
 mocha -r ts-node/register *.spec.ts --exit
 ```
 
-Cypherpost servers are currently situated in Canada hence responses from them are slow when testing from Asia/Pacific reigon.
-cypherpost.spec.ts will therefore require a timeout with mocha.
+cypherpost & stackmate tests require a timeout since they make network calls.
 
 ```
-mocha -r ts-node/register cypherpost*.spec.ts --timeout 10000 --exit
+cd src/cypherpost
+mocha -r ts-node/register cypherpost.spec.ts --timeout 10000 --exit
 ```
 
+```
+cd src/wallet
+mocha -r ts-node/register stackmate.spec.ts --timeout 10000 --exit
+```
 ## wallet/bin
 
 Since this project has just started and is primarily being built on Linux, binaries only exist for Linux. 
@@ -50,3 +54,4 @@ Since this project has just started and is primarily being built on Linux, binar
 If testing on Mac or Windows, you will have to compile [stackmate-core](https://github.com/i5hi/stackmate-core) binaries for those targets.  
 
 This will be added later.
+

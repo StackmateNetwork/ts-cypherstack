@@ -38,3 +38,35 @@ export enum ScriptType {
   SegwitP2SH = "sh-wsh",
   LegacyScript = "sh"
 }
+
+export type NetworkFee = {
+  rate:  number;
+  absolute: number;
+}
+
+export enum NodeAddress  {
+  Default = "default",
+}
+export type WalletAddress = {
+  address:string
+}
+export type WalletBalance = {
+  balance: number
+}
+export type WalletTransaction = {
+  timestamp: number,
+  height: number,
+  verified: boolean,
+  txid: string,
+  received: number,
+  sent: number,
+  fee: number
+}
+export type WalletHistory =  {
+  history: WalletTransaction[]
+}
+
+export type WalletPSBT = {
+  psbt: string,
+  is_finalized: boolean
+}

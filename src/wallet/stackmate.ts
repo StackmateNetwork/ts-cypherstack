@@ -3,7 +3,7 @@ const MAC_PATH = "./bin/osx/libstackmate.dylib";
 const WINDOWNS_PATH = "./bin/win32/libstackmate.dll";
 
 import { handleError } from "../lib/error";
-import { BitcoinNetwork, ChildKey, MasterKey, MnemonicWords, PurposePath, ScriptType, WalletPolicy } from "./types/data";
+import { BitcoinNetwork, ChildKey, MasterKey, MnemonicWords, NetworkFee, NodeAddress, PurposePath, ScriptType, WalletAddress, WalletBalance, WalletHistory, WalletPolicy, WalletPSBT, WalletTransaction } from "./types/data";
 
 const ffi = require("ffi-napi")
 const string = "string";
@@ -28,7 +28,13 @@ export const stackmate = ffi.Library(libStackmateLocation, {
   generate_master: [string, [string, string, string]],
   import_master: [string, [string, string, string]],
   derive_hardened: [string, [string, string, string]],
-  compile:[string, [string, string]]
+  compile:[string, [string, string]],
+  estimate_network_fee:[string, [string,string,string]],
+  get_address:[string, [string,string]],
+  sync_balance:[string, [string,string]],
+  sync_history:[string, [string,string]],
+  build_tx:[string, [string,string,string,string,string,string]]  
+
 });
 
 export function generateMaster(network: BitcoinNetwork,strength: MnemonicWords, passphrase: string): MasterKey | Error {
@@ -115,9 +121,133 @@ export function compilePolicy(policy_string: string, script_type: ScriptType): W
 }
 
 export function createExtendedKeyString(child_key: ChildKey): string{
-  return `[${child_key.fingerprint}/${child_key.hardened_path}]${child_key.xpub}/*`;
+  return `[${child_key.fingerprint}/${child_key.hardened_path.substring(2)}]${child_key.xpub}/*`;
 }
 
 export function createMultiPolicyString(thresh: number, keys: string[]): string{
   return `thresh(${thresh},${keys.map(key=>`pk(${key})`).join(",")})`;
+}
+
+export function estimateNetworkFee(network: BitcoinNetwork, node_address: NodeAddress,confirmation_blocks:number): NetworkFee | Error{
+  try {
+    const stringified = stackmate.estimate_network_fee(network.toString(),node_address.toString(),confirmation_blocks.toString());
+    const json = JSON.parse(stringified);
+
+    console.log(json)
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        rate: parseFloat(json.rate),
+        absolute: (json.absolute == null)?0:parseInt(json.absolute)
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
+}
+
+export function getAddress(descriptor: string, index: number): WalletAddress | Error{
+  try {
+    const stringified = stackmate.get_address(descriptor,index.toString());
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        address: json.address
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
+}
+
+export function syncBalance(descriptor: string, node_address: NodeAddress): WalletBalance | Error{
+  try {
+    const stringified = stackmate.sync_balance(descriptor,node_address.toString());
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        balance: json.balance
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
+}
+
+export function syncHistory(descriptor: string, node_address: NodeAddress): WalletHistory | Error{
+  try {
+    const stringified = stackmate.sync_history(descriptor,node_address.toString());
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        history: json.history.map((item)=>{
+          const transaction: WalletTransaction = {
+            timestamp: item.timestamp,
+            height: item.height,
+            verified: item.verified,
+            txid: item.txid,
+            received: item.received,
+            sent: item.sent,
+            fee: item.fee
+          }
+          return transaction;
+        })
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
+}
+
+export function buildTransaction(
+  descriptor: string, 
+  node_address: NodeAddress, 
+  to_address: string, 
+  amount: number, 
+  fee_absolute: number, 
+  sweep: boolean
+): WalletPSBT | Error{
+  try {
+    const stringified = stackmate.build_tx(
+      descriptor,
+      node_address.toString(),
+      to_address,
+      amount.toString(),
+      fee_absolute.toString(),
+      sweep.toString()
+    );
+    
+    const json = JSON.parse(stringified);
+
+    if (json.hasOwnProperty("kind")) {
+      return handleError(json);
+    }
+    else {
+      return {
+        psbt: json.psbt,
+        is_finalized: (json.is_finalized=="true")?true:false,
+      }
+    }
+  }
+  catch (e) {
+    return handleError(e);
+  }
 }
