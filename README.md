@@ -1,4 +1,4 @@
-# stackmate-cli
+# ts-cypherstack
 
 [stackmate-core](https://github.com/i5hi/stackmate-core) provides a C-FFI library powered by [bdk](https://github.com/bitcoindevkit/bdk), to create and manage descriptor wallets. 
 
